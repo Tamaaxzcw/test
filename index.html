@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shizuka Soft | WhatsApp Bot</title>
+    <meta name="description" content="Shizuka Soft, bot WhatsApp canggih yang dibangun dengan teknologi terbaru. Dibuat oleh Rieze/daffa dan Cecep, menggunakan Baileys, JavaScript/TypeScript, dan database SHZK-DB.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- [ 1. CSS RESET & GLOBAL STYLES ] --- */
+        :root {
+            --bg-color: #1e1e1f;
+            --sidebar-bg: #242426;
+            --card-bg: #2c2c2e;
+            --border-color: #383838;
+            --primary-text-color: #f2f2f2;
+            --secondary-text-color: #a0a0a0;
+            --accent-color: #a977e6; /* Warna aksen ungu lembut */
+            --accent-hover-color: #b38be9;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --border-radius: 20px;
+            --transition-speed: 0.3s;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--primary-text-color);
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        /* --- [ 2. MAIN LAYOUT STRUCTURE ] --- */
+        .portfolio-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: flex;
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        /* --- [ 3. SIDEBAR / ASIDE ] --- */
+        .sidebar {
+            flex: 0 0 300px;
+            background-color: var(--sidebar-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            position: sticky;
+            top: 40px;
+            align-self: flex-start;
+            height: fit-content;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .profile-info {
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--border-color);
+            margin-bottom: 20px;
+            background-color: var(--card-bg);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-title {
+            background-color: var(--card-bg);
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .info-toggle {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .info-toggle svg {
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .info-toggle.active svg {
+            transform: rotate(180deg);
+        }
+
+        .contact-info {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+        
+        .contact-info.active {
+            max-height: 500px; /* Cukup besar untuk menampung konten */
+            opacity: 1;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-icon {
+            background-color: var(--card-bg);
+            width: 45px;
+            height: 45px;
+            min-width: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            box-shadow: 0 4px 10px var(--shadow-color);
+        }
+
+        .contact-details h4 {
+            font-size: 0.8rem;
+            color: var(--secondary-text-color);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .contact-details p {
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin: 0;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .social-links a {
+            color: var(--secondary-text-color);
+            font-size: 1.5rem;
+            transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+
+        /* --- [ 4. MAIN CONTENT AREA ] --- */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .content-navbar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+        }
+        
+        .content-navbar nav {
+            background-color: var(--sidebar-bg);
+            padding: 8px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+        
+        .content-navbar button {
+            background: none;
+            border: none;
+            color: var(--secondary-text-color);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 15px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .content-navbar button.active {
+            color: var(--bg-color);
+            background-color: var(--accent-color);
+        }
+        
+        .content-page {
+            display: none;
+            background-color: var(--sidebar-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px var(--shadow-color);
+            animation: fadeIn 0.6s ease;
+        }
+
+        .content-page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .page-header p, .section-header p {
+            color: var(--secondary-text-color);
+            font-size: 1rem;
+        }
+        
+        .page-header .typing-effect {
+            color: var(--accent-color);
+            min-height: 1.2em; /* Mencegah layout jumping */
+            font-weight: 600;
+        }
+        
+        .section-header {
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .section-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* --- [ 5. SPECIFIC PAGE STYLES: ABOUT, SKILLS, PROJECTS ] --- */
+
+        /* ABOUT PAGE */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .service-card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+        
+        .service-card .service-icon {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+        
+        .service-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .service-card p {
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+        }
+
+        /* SKILLS PAGE */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+        
+        .skill-item {
+            background-color: var(--card-bg);
+            color: var(--primary-text-color);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all var(--transition-speed) ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        .skill-item:hover {
+            color: var(--accent-color);
+            transform: scale(1.05);
+            border-color: var(--accent-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .skill-item svg {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-color);
+            transition: color var(--transition-speed) ease;
+        }
+
+        /* PROJECTS PAGE */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .project-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px var(--shadow-color);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: var(--bg-color);
+        }
+        
+        .project-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .project-info h4 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .project-info p {
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: auto;
+        }
+        
+        .project-tags span {
+            background-color: var(--bg-color);
+            color: var(--accent-color);
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        
+
+        /* --- [ 6. RESPONSIVE DESIGN ] --- */
+        @media (max-width: 1024px) {
+            .portfolio-container {
+                flex-direction: column;
+                margin: 20px auto;
+            }
+            .sidebar {
+                flex: 1;
+                position: relative;
+                top: 0;
+                width: 100%;
+            }
+            .content-navbar {
+                justify-content: center;
+            }
+            .content-navbar nav {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            .content-navbar nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 5px;
+            }
+            .content-navbar button {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            .content-page {
+                padding: 25px;
+            }
+            .page-header h2 {
+                font-size: 1.8rem;
+            }
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portfolio-container">
+        
+        <aside class="sidebar">
+            <div class="profile-info">
+                <img src="https://files.catbox.moe/u5kqaq.jpg" alt="Logo Shizuka Soft" class="profile-avatar">
+                
+                <h1 class="profile-name">Shizuka Soft</h1>
+                <p class="profile-title">WhatsApp Bot v0.1.0</p>
+                
+                <button class="info-toggle" aria-label="Tampilkan info proyek">
+                    <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+                    </div>
+                    <div class="contact-details">
+                        <h4>Creators</h4>
+                        <p>Daffa & Cecep</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.9,2.1c-4.6,0.5-8.3,4.2-8.8,8.7c-0.6,5,2.5,9.3,6.9,10.7v-2.3c0,0-0.4,0.1-0.9,0.1c-1.4,0-2-1-2-2c0-0.9,0.7-1.4,0.7-1.4 C6,15.1,5.6,14,5.4,13.5c-0.2-0.5-0.7-1-1.2-1.3c-0.5-0.3-0.1-0.2,0.1-0.2c0.6,0.1,1,0.7,1.2,1c0.2,0.3,0.4,0.6,0.8,0.8 c0.7,0.4,1.1,0.2,1.2,0.1c0.1-0.5,0.3-0.9,0.7-1.2c-2.2-0.2-4.5-1.1-4.5-5c0-1.1,0.4-2,1.1-2.7C4.6,6.2,4.3,5.1,4.9,4 c0,0,0.9-0.3,2.9,1.7C8.4,5.5,9.2,5.3,10,5.3c0.8,0,1.6,0.2,2.2,0.6c2-2,2.9-1.7,2.9-1.7c0.6,1.1,0.3,2.2,0.2,2.5 c0.7,0.7,1.1,1.6,1.1,2.7c0,3.9-2.3,4.8-4.5,5c0.4,0.3,0.7,0.9,0.7,1.7v2.6c4.4-1.4,7.5-5.7,6.9-10.7C20.4,6.9,16.5,2.6,10.9,2.1z"></path></svg>
+                    </div>
+                    <div class="contact-details">
+                        <h4>Baileys</h4>
+                        <p>ShizukaSoft/baileys</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10c5.52,0,10-4.48,10-10S17.52,2,12,2z M12,18.66c-3.68,0-6.66-2.98-6.66-6.66 c0-3.68,2.98-6.66,6.66-6.66s6.66,2.98,6.66,6.66C18.66,15.68,15.68,18.66,12,18.66z M11,6h2v6h-2V6z M11,14h2v2h-2V14z"></path></svg>
+                    </div>
+                    <div class="contact-details">
+                        <h4>Database</h4>
+                        <p>SHZK-DB v0.1.2</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12 1C5.93 1 1 5.93 1 12v7c0 1.1.9 2 2 2h4v-8H3v-1c0-4.96 4.04-9 9-9s9 4.04 9 9v1h-4v8h4c1.1 0 2-.9 2-2v-7C23 5.93 18.07 1 12 1z"></path></svg>
+                    </div>
+                    <div class="contact-details">
+                        <h4>Customer Service</h4>
+                        <p><a href="https://wa.me/6283890689347" target="_blank" rel="noopener noreferrer" style="color: var(--primary-text-color); text-decoration: none;">+62 838-9068-9347</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="https://chat.whatsapp.com/BpFzZLCByhx9yZEAMr6uol?mode=ac_t" aria-label="WhatsApp Group" target="_blank" rel="noopener noreferrer">
+                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"></path></svg>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-navbar">
+                <nav>
+                    <button class="nav-button active" data-page="about">Tentang</button>
+                    <button class="nav-button" data-page="features">Fitur</button>
+                    <button class="nav-button" data-page="tech">Teknologi</button>
+                </nav>
+            </header>
+
+            <article id="about" class="content-page active">
+                <header class="page-header">
+                    <h2>Tentang Shizuka Soft</h2>
+                    <p>Kami <span class="typing-effect"></span></p>
+                </header>
+                <section>
+                    <p>Selamat datang di Shizuka Soft! Sebuah proyek bot WhatsApp open-source yang dirancang untuk memberikan kemudahan dan fitur-fitur canggih langsung di genggaman Anda. Dikembangkan dengan penuh semangat oleh <strong>Rieze/daffa</strong> dan <strong>Cecep</strong>, Shizuka Soft hadir sebagai asisten virtual yang cerdas dan responsif.</p>
+                    <p>Kami percaya pada kekuatan kolaborasi dan kode sumber terbuka. Oleh karena itu, Shizuka Soft dibangun menggunakan teknologi modern dan dapat diandalkan, dengan tujuan untuk terus berkembang bersama komunitas.</p>
+                </section>
+                
+                <section class="section-header">
+                    <h3>Kelebihan Kami</h3>
+                </section>
+                <section class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon">笞｡</div>
+                        <h4>Performa Tinggi</h4>
+                        <p>Dibuat dengan kode yang dioptimalkan untuk memastikan respon yang cepat dan penggunaan sumber daya yang efisien.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">逃</div>
+                        <h4>Fitur Lengkap</h4>
+                        <p>Dari hiburan hingga alat bantu produktivitas, kami menyediakan beragam fitur untuk segala kebutuhan Anda.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">総</div>
+                        <h4>Mudah Digunakan</h4>
+                        <p>Dengan command yang intuitif dan antarmuka yang ramah pengguna, siapa saja dapat menggunakan Shizuka Soft.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">訣</div>
+                        <h4>Unik</h4>
+                        <p>Memiliki fitur yang jarang ada di bot lain.</p>
+                    </div>
+                </section>
+            </article>
+
+            <article id="features" class="content-page">
+                 <header class="page-header">
+                    <h2>Fitur Unggulan</h2>
+                    <p>Jelajahi berbagai kemampuan yang ditawarkan oleh Shizuka Soft.</p>
+                </header>
+                <section class="projects-grid">
+                    <div class="project-card">
+                        <img src="https://files.catbox.moe/a6f8d9.jpg" alt="Fitur Downloader" class="project-image">
+                        <div class="project-info">
+                            <h4>Downloader All-in-One</h4>
+                            <p>Unduh video dan audio dari berbagai platform populer seperti YouTube, TikTok, Instagram, dan lainnya dengan mudah.</p>
+                            <div class="project-tags">
+                                <span>Youtube</span>
+                                <span>Instagram</span>
+                                <span>TikTok</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                         <img src="https://files.catbox.moe/okrb93.jpg" alt="Fitur Pasangan" class="project-image">
+                        <div class="project-info">
+                            <h4>Fitur Pasangan</h4>
+                            <p>Berhubungan dan buat hubungan kalian semakin langgeng.</p>
+                            <div class="project-tags">
+                                <span>Roleplay</span>
+                                <span>Character</span>
+                                <span>Anime</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="project-card">
+                         <img src="https://files.catbox.moe/dxqm5b.jpg" alt="Fitur Investasi" class="project-image">
+                        <div class="project-info">
+                            <h4>Fitur Investasi Market</h4>
+                            <p>Berinvestasi untuk mendapatkan uang, setiap barang harga nya variatif.</p>
+                            <div class="project-tags">
+                                <span>Market</span>
+                                <span>Crypto</span>
+                                <span>Economy</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </article>
+
+            <article id="tech" class="content-page">
+                <header class="page-header">
+                    <h2>Teknologi yang Digunakan</h2>
+                    <p>Fondasi kokoh yang membangun Shizuka Soft.</p>
+                </header>
+
+                <section>
+                    <div class="section-header"><h3>Bahasa & Library</h3></div>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                            <span>JavaScript</span>
+                        </div>
+                        <div class="skill-item">
+                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            <span>TypeScript</span>
+                        </div>
+                        <div class="skill-item">
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M20,2H4C2.9,2,2,2.9,2,4v16c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M12,18L7,15v-5l5,3V18z M17,10 l-5-3l-5,3V7l5-3l5,3V10z"></path></svg>
+                            <span>ShizukaSoft/baileys</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <div class="section-header"><h3>Database</h3></div>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12,2C6.486,2,2,6.486,2,12s4.486,10,10,10s10-4.486,10-10S17.514,2,12,2z M12,20c-4.411,0-8-3.589-8-8s3.589-8,8-8 s8,3.589,8,8S16.411,20,12,20z"></path><path d="M12,6c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6S15.309,6,12,6z M12,16c-2.206,0-4-1.794-4-4s1.794-4,4-4 s4,1.794,4,4S14.206,16,12,16z"></path></svg>
+                            <span>SHZK-DB 0.1.2</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <div class="section-header"><h3>Lingkungan & Tools</h3></div>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="20" height="18" rx="2" ry="2"></rect><line x1="9" y1="7" x2="15" y2="7"></line></svg>
+                            <span>Node.js</span>
+                        </div>
+                        <div class="skill-item">
+                            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                             <span>Git</span>
+                        </div>
+                         <div class="skill-item">
+                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                             <span>Docker</span>
+                        </div>
+                    </div>
+                </section>
+            </article>
+            
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- [ 1. INTERACTIVITY FOR PAGE NAVIGATION (TABS) ] ---
+    const navButtons = document.querySelectorAll('.nav-button');
+    const contentPages = document.querySelectorAll('.content-page');
+
+    navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const pageId = button.dataset.page;
+
+            // Update button active state
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // Update content page visibility
+            contentPages.forEach(page => {
+                if (page.id === pageId) {
+                    page.classList.add('active');
+                } else {
+                    page.classList.remove('active');
+                }
+            });
+        });
+    });
+
+    // --- [ 2. INTERACTIVITY FOR SIDEBAR CONTACT INFO TOGGLE ] ---
+    const infoToggle = document.querySelector('.info-toggle');
+    const contactInfo = document.querySelector('.contact-info');
+
+    infoToggle.addEventListener('click', () => {
+        infoToggle.classList.toggle('active');
+        contactInfo.classList.toggle('active');
+    });
+
+    // --- [ 3. TYPING EFFECT ] ---
+    const typingElement = document.querySelector('.typing-effect');
+    // Pastikan elemen ada sebelum melanjutkan
+    if (typingElement) {
+        const roles = ["Asisten Cerdas Anda.", "Multi-Device Bot.", "Selalu Aktif.", "Dibangun dengan Cinta."];
+        let roleIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function type() {
+            const currentRole = roles[roleIndex];
+            let displayText = '';
+
+            if (isDeleting) {
+                displayText = currentRole.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                displayText = currentRole.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            typingElement.textContent = displayText;
+
+            let typeSpeed = isDeleting ? 75 : 150;
+
+            if (!isDeleting && charIndex === currentRole.length) {
+                typeSpeed = 2000; // Pause at the end of a word
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % roles.length;
+                typeSpeed = 500; // Pause before starting a new word
+            }
+
+            setTimeout(type, typeSpeed);
+        }
+
+        // Start the typing effect
+        type();
+    }
+});
+</script>
+
+</body>
+</html>
